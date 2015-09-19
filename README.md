@@ -18,3 +18,7 @@ Web Interface:
 ```
 pkgcritic -web -open
 ```
+
+![web](https://raw.githubusercontent.com/bom-d-van/pkgcritic/master/intro/web.png)
+
+![cli](https://raw.githubusercontent.com/bom-d-van/pkgcritic/master/intro/cli.png)
