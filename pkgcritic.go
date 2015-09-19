@@ -23,6 +23,7 @@ import (
 )
 
 var debug bool
+var token string
 
 func init() {
 	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
@@ -33,7 +34,12 @@ func main() {
 	web := flag.Bool("web", false, "show result in browser and start a web server")
 	open := flag.Bool("open", false, "open browser")
 	query := flag.String("q", "", "godoc query keyword")
+	flag.StringVar(&token, "github-token", "", "github token for more github requests")
 	flag.Parse()
+
+	if token == "" {
+		fmt.Println("specify -github-token can increase github api rate limits: https://github.com/settings/tokens")
+	}
 
 	if *web {
 		type data struct {
@@ -108,11 +114,13 @@ func report(query string) (githubs, nonGithubs []*Critique, err error) {
 		return
 	}
 
-	// printutils.PrettyPrint(results)
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: "c02e81a83912eb665d69d13066641ae60f575e3e"},
-	)
-	tc := oauth2.NewClient(oauth2.NoContext, ts)
+	var tc *http.Client
+	if token != "" {
+		ts := oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: token},
+		)
+		tc = oauth2.NewClient(oauth2.NoContext, ts)
+	}
 
 	client := github.NewClient(tc)
 

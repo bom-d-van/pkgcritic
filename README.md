@@ -12,14 +12,19 @@ Cli Interface:
 
 
 ```
-pkgcritic -q browser
+pkgcritic -q browser -github-token xxxxx
 ```
 
 Web Interface:
 
 ```
-pkgcritic -web -open
+pkgcritic -web -open -github-token xxxxx
 ```
+
+Note: using `-github-token` is to increase github api rate limit.
+Details cound be found here:
+https://developer.github.com/v3/oauth/
+https://github.com/settings/tokens
 
 ![web](https://raw.githubusercontent.com/bom-d-van/pkgcritic/master/intro/web.png)
 
