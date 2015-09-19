@@ -4,6 +4,8 @@
 
 Pkg Critic also uses indentation to show the fork relationship between packages.
 
+The GoDoc search result is re-ordered by GitHub Stars.
+
 # Usage
 
 Cli Interface:
