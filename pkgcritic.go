@@ -1,3 +1,8 @@
+// pkgcritic is a tool combining search results from GoDoc API and stats info from GitHub API.
+//
+// pkgcritic also uses indentation to show the fork relationship between packages.
+// The GoDoc search result is re-ordered by GitHub Stars.
+//
 package main
 
 import (
