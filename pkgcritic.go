@@ -49,6 +49,9 @@ func main() {
 		caches := map[string]data{}
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			query := strings.TrimSpace(r.URL.Query().Get("query"))
+			if query == "" {
+				return
+			}
 			log.Println("Query:", query)
 			d, ok := caches[query]
 			if ok {
