@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	debugpkg "runtime/debug"
 	"sort"
@@ -34,6 +35,7 @@ func main() {
 	web := flag.Bool("web", false, "show result in browser and start a web server")
 	open := flag.Bool("open", false, "open browser")
 	query := flag.String("q", "", "godoc query keyword")
+	port := flag.String("port", "9090", "web server port number")
 	flag.StringVar(&token, "github-token", "", "github token for more github requests")
 	flag.Parse()
 
@@ -49,19 +51,21 @@ func main() {
 		caches := map[string]data{}
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			query := strings.TrimSpace(r.URL.Query().Get("query"))
-			if query == "" {
-				return
+			if query != "" {
+				log.Println("Query:", query)
 			}
-			log.Println("Query:", query)
 			d, ok := caches[query]
 			if ok {
 				goto render
 			} else if query != "" {
 				githubs, nonGithubs, err := report(query)
 				if err != nil {
-					if _, err := w.Write([]byte(err.Error())); err != nil {
+					log.Println(err)
+					if _, err := w.Write([]byte(err.Error() + "\n" + string(debugpkg.Stack()))); err != nil {
 						log.Println(err)
 					}
+					debugpkg.PrintStack()
+					return
 				}
 				d = data{
 					Query:      query,
@@ -77,13 +81,13 @@ func main() {
 			}
 		})
 
-		log.Println("Listening on :7070")
+		log.Println("Listening on :" + *port)
 		if *open {
-			if err := browser.OpenURL("http://localhost:7070"); err != nil {
+			if err := browser.OpenURL("http://localhost:" + *port); err != nil {
 				log.Println(err)
 			}
 		}
-		http.ListenAndServe(":7070", nil)
+		log.Fatal(http.ListenAndServe(":"+*port, nil))
 	} else {
 		if *query == "" {
 			log.Println("Please specify query keyword by -q")
@@ -107,7 +111,7 @@ func main() {
 }
 
 func report(query string) (githubs, nonGithubs []*Critique, err error) {
-	resp, err := http.Get("http://api.godoc.org/search?q=" + query)
+	resp, err := http.Get("http://api.godoc.org/search?q=" + url.QueryEscape(query))
 	if err != nil {
 		return
 	}
